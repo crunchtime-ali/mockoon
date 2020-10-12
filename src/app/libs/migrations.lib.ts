@@ -1,6 +1,5 @@
-import { Environment } from 'src/app/types/environment.type';
-import { Header, Route, RouteResponse } from 'src/app/types/route.type';
 import { v1 as uuid } from 'uuid';
+import { Environment, Route, RouteResponse, Header } from '@mockoon/commons';
 
 export const Migrations: {
   id: number;

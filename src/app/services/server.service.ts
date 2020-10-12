@@ -1,27 +1,26 @@
 import { Injectable } from '@angular/core';
+import {
+  BINARY_BODY,
+  CORSHeaders,
+  Environment,
+  GetContentType,
+  GetRouteResponseContentType,
+  Header,
+  IsValidURL,
+  MimeTypesWithTemplating,
+  MockoonServer,
+  Route,
+  TestHeaderValidity
+} from '@mockoon/commons';
 import * as express from 'express';
 import { readFile } from 'fs';
-import { createServer as httpCreateServer, Server as httpServer } from 'http';
 import { createProxyMiddleware } from 'http-proxy-middleware';
-import {
-  createServer as httpsCreateServer,
-  Server as httpsServer
-} from 'https';
-import * as killable from 'killable';
 import { lookup as mimeTypeLookup } from 'mime-types';
 import { basename } from 'path';
 import { Logger } from 'src/app/classes/logger';
 import { ResponseRulesInterpreter } from 'src/app/classes/response-rules-interpreter';
-import { BINARY_BODY } from 'src/app/constants/server.constants';
 import { Errors } from 'src/app/enums/errors.enum';
-import { Middlewares } from 'src/app/libs/express-middlewares.lib';
 import { TemplateParser } from 'src/app/libs/template-parser.lib';
-import {
-  GetContentType,
-  GetRouteResponseContentType,
-  IsValidURL,
-  TestHeaderValidity
-} from 'src/app/libs/utils.lib';
 import { DataService } from 'src/app/services/data.service';
 import { EventsService } from 'src/app/services/events.service';
 import { ToastsService } from 'src/app/services/toasts.service';
@@ -32,23 +31,24 @@ import {
   setActiveEnvironmentAction,
 } from 'src/app/stores/actions';
 import { Store } from 'src/app/stores/store';
-import { Environment } from 'src/app/types/environment.type';
-import {
-  CORSHeaders,
-  Header,
-  mimeTypesWithTemplating,
-  Route
-} from 'src/app/types/route.type';
 
 const httpsConfig = {
   key: pemFiles.key,
   cert: pemFiles.cert
 };
 
+// To be moved
+const errorsText = {
+  PORT_ALREADY_USED: '',
+  PORT_INVALID: '',
+  REQUEST_BODY_PARSE: '',
+  UNKNOWN_SERVER_ERROR: ''
+};
+
 @Injectable({ providedIn: 'root' })
 export class ServerService {
   // running servers instances
-  private instances: { [key: string]: any } = {};
+  private instances: { [key: string]: MockoonServer } = {};
   private logger = new Logger('[SERVICE][SERVER]');
 
   constructor(
@@ -64,7 +64,120 @@ export class ServerService {
    * @param environment - an environment
    */
   public start(environment: Environment) {
-    const server = express();
+    const newServer = new MockoonServer(environment, {
+      refreshEnvironmentFunction: (environmentUUID) =>
+        this.store.getEnvironmentByUUID(environmentUUID),
+      refreshDuplicatedRoutesFunction: (environmentUUID) =>
+        this.store.get('duplicatedRoutes')[environmentUUID]
+    });
+
+    newServer.start();
+
+    newServer.once('starting', () => {
+      this.logger.info(
+        `Starting server ${environment.uuid} on port ${environment.port}`
+      );
+    });
+
+    newServer.once('creating-proxy', () => {
+      this.logger.info(
+        `Creating proxy between localhost:${environment.port} and ${environment.proxyHost}`
+      );
+    });
+
+    newServer.once('started', () => {
+      this.logger.info(
+        `Server ${environment.uuid} was started successfully on port ${environment.port}`
+      );
+
+      this.instances[environment.uuid] = newServer;
+
+      this.store.update(
+        updateEnvironmentStatusAction({ running: true, needRestart: false })
+      );
+    });
+
+    newServer.once('stopped', () => {
+      this.logger.info(`Server ${environment.uuid} has been stopped`);
+
+      this.store.update(
+        updateEnvironmentStatusAction({
+          running: false,
+          needRestart: false
+        })
+      );
+      delete this.instances[environment.uuid];
+    });
+
+    newServer.on('error', (errorCode, originalError) => {
+      // WIP create new text table, and log error + toast if specific error
+      //this.logger.error();
+      /**
+       * PORT_ALREADY_USED -> logger + toast / static message
+       *
+       * #####################################################
+       *
+       * PORT_INVALID -> logger + toast / static message
+       *
+       * #####################################################
+       *
+       * UNKNOWN_SERVER_ERROR -> logger + toast / message prefix + originalError.message
+       *
+       * #####################################################
+       *
+       * REQUEST_BODY_PARSE -> logger + toast / message prefix 'Error while parsing entering body: ' + originalError.message
+       *
+       * #####################################################
+       *
+       * ROUTE_CREATION_ERROR -> logger + toast (only if invalid regex) / message prefix 'Error while parsing entering body: ' + originalError.message
+       * this.logger.error(`Error while creating the route: ${error.message}`);
+          // if invalid regex defined
+          if (error.message.indexOf('Invalid regular expression') > -1) {
+            this.toastService.addToast(
+              'error',
+              Errors.INVALID_ROUTE_REGEX + declaredRoute.endpoint
+            );
+          }
+       *
+       * #####################################################
+       *
+       * ROUTE_SERVING_ERROR logger msg + originalerror message
+       *
+       * #####################################################
+       *
+       * ROUTE_FILE_SERVING_ERROR logger msg + originalerror message
+       *
+       * #####################################################
+       *
+       * PROXY_ERROR logger error + originalerror message
+       *
+       *
+       */
+      /* this.logger.error(
+        `Error when starting the server ${environment.uuid}: ${error.message}`
+      ); */
+      /* if (error.code === 'EADDRINUSE') {
+        this.toastService.addToast('error', Errors.PORT_ALREADY_USED);
+      } else if (error.code === 'EACCES') {
+        this.toastService.addToast('error', Errors.PORT_INVALID);
+      } else {
+        this.toastService.addToast('error', error.message);
+      } */
+    });
+
+    newServer.on('entering-request', () => {
+      this.logger.info('entering req');
+    });
+
+    newServer.on('response-close', (response) => {
+      this.store.update(
+        logRequestAction(environment.uuid, this.dataService.formatLog(response))
+      );
+    });
+
+    // -------------------------------
+
+    /* const server = express();
     server.disable('x-powered-by');
     server.disable('etag');
 
@@ -86,8 +199,8 @@ export class ServerService {
 
     this.logger.info(
       `Starting server ${environment.uuid} on port ${environment.port}`
-    );
-    serverInstance.listen(environment.port, () => {
+    ); */
+    /* serverInstance.listen(environment.port, () => {
       this.logger.info(
         `Server ${environment.uuid} was started successfully on port ${environment.port}`
       );
@@ -96,25 +209,25 @@ export class ServerService {
       this.store.update(
         updateEnvironmentStatusAction({ running: true, needRestart: false }, environment.uuid),
       );
-    });
-
+    }); */
+    /*
     Middlewares(
       this.eventsService,
       () => this.store.getEnvironmentByUUID(environment.uuid).latency
     ).forEach((expressMiddleware) => {
       server.use(expressMiddleware);
-    });
+    }); */
 
     // apply latency, cors, routes and proxy to express server
-    this.logRequest(server, environment);
+    /*     this.logRequest(server, environment);
     this.setResponseHeaders(server, environment);
     this.setRoutes(server, environment);
     this.setCors(server, environment);
     this.enableProxy(server, environment);
-    this.errorHandler(server);
+    this.errorHandler(server); */
 
     // handle server errors
-    serverInstance.on('error', (error: any) => {
+    /* serverInstance.on('error', (error: any) => {
       this.logger.error(
         `Error when starting the server ${environment.uuid}: ${error.message}`
       );
@@ -126,16 +239,33 @@ export class ServerService {
       } else {
         this.toastService.addToast('error', error.message);
       }
-    });
+    }); */
 
-    killable(serverInstance);
+    // killable(serverInstance);
   }
 
   /**
    * Completely stop an environment / server
    */
   public stop(environmentUUID: string) {
-    const instance = this.instances[environmentUUID];
+    if (this.instances[environmentUUID]) {
+      /* this.instances[environmentUUID].on('SERVER_STOPPED', () => {
+        this.logger.info(`Server ${environmentUUID} has been stopped`);
+
+        this.store.update(
+          updateEnvironmentStatusAction({
+            running: false,
+            needRestart: false
+          })
+        );
+        delete this.instances[environmentUUID];
+      }); */
+      this.instances[environmentUUID].stop();
+    }
+
+    // ----------------
+
+    /* const instance = this.instances[environmentUUID];
 
     if (instance) {
       instance.kill(() => {
@@ -146,7 +276,7 @@ export class ServerService {
           updateEnvironmentStatusAction({ running: false, needRestart: false }, environmentUUID)
         );
       });
-    }
+    } */
   }
 
   /**
@@ -260,7 +390,7 @@ export class ServerService {
 
                         // parse templating for a limited list of mime types
                         if (
-                          mimeTypesWithTemplating.indexOf(fileMimeType) > -1 &&
+                          MimeTypesWithTemplating.indexOf(fileMimeType) > -1 &&
                           !enabledRouteResponse.disableTemplating
                         ) {
                           const fileContent = TemplateParser(

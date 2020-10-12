@@ -1,9 +1,15 @@
+import {
+  Environment,
+  Environments,
+  GetRouteResponseContentType,
+  Route,
+  RouteResponse
+} from '@mockoon/commons';
 import { Config } from 'src/app/config';
 import { HighestMigrationId } from 'src/app/libs/migrations.lib';
 import {
   ArrayContainsObjectKey,
-  GetEditorModeFromContentType,
-  GetRouteResponseContentType
+  GetEditorModeFromContentType
 } from 'src/app/libs/utils.lib';
 import {
   ActiveEnvironmentsLogUUIDs,
@@ -16,8 +22,6 @@ import {
   EnvironmentsStatuses,
   StoreType
 } from 'src/app/stores/store';
-import { Environment, Environments } from 'src/app/types/environment.type';
-import { Route, RouteResponse } from 'src/app/types/route.type';
 
 export type ReducerDirectionType = 'next' | 'previous';
 export type ReducerIndexes = { sourceIndex: number; targetIndex: number };

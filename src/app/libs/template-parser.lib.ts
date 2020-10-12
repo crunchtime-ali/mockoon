@@ -6,7 +6,7 @@ import { random } from 'lodash';
 import { get as objectGet } from 'object-path';
 import { Logger } from 'src/app/classes/logger';
 import { OldTemplatingHelpers } from 'src/app/libs/old-templating-helpers';
-import { IsEmpty } from 'src/app/libs/utils.lib';
+import { IsEmpty } from '@mockoon/commons';
 import ObjectId from 'bson-objectid';
 
 const logger = new Logger('[LIB][TEMPLATE-PARSER]');

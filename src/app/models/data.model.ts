@@ -1,5 +1,4 @@
-import { Environment, Environments } from 'src/app/types/environment.type';
-import { Route } from 'src/app/types/route.type';
+import { Environment, Environments, Route } from '@mockoon/commons';
 
 export type DataSubject = 'environment' | 'route';
 

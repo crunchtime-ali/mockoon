@@ -19,12 +19,8 @@ import {
 } from 'rxjs/operators';
 import { SelectOptionsList } from 'src/app/models/common.model';
 import { EnvironmentsService } from 'src/app/services/environments.service';
-import {
-  LogicalOperators,
-  ResponseRule,
-  ResponseRuleTargets,
-  RouteResponse
-} from 'src/app/types/route.type';
+import { RouteResponse, LogicalOperators, ResponseRuleTargets, ResponseRule } from '@mockoon/commons';
+
 
 @Component({
   selector: 'app-route-response-rules',

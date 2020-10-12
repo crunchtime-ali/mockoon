@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
+import {
+  BINARY_BODY,
+  Environment,
+  Environments,
+  Route
+} from '@mockoon/commons';
 import { Response } from 'express';
-import { BINARY_BODY } from 'src/app/constants/server.constants';
 import { AscSort, ObjectValuesFlatten } from 'src/app/libs/utils.lib';
 import { EnvironmentLog } from 'src/app/models/environment-logs.model';
 import { Store } from 'src/app/stores/store';
-import { Environment, Environments } from 'src/app/types/environment.type';
-import { Route } from 'src/app/types/route.type';
 import { parse as urlParse } from 'url';
 import { v1 as uuid } from 'uuid';
 

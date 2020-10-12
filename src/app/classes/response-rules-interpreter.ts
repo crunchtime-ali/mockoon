@@ -1,11 +1,8 @@
 import { Request } from 'express';
 import { get as objectPathGet } from 'object-path';
 import { parse as qsParse, ParsedUrlQuery } from 'querystring';
-import {
-  ResponseRule,
-  ResponseRuleTargets,
-  RouteResponse
-} from 'src/app/types/route.type';
+import { ResponseRuleTargets, RouteResponse, ResponseRule } from '@mockoon/commons';
+
 
 /**
  * Interpretor for the route response rules.

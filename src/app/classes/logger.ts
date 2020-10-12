@@ -1,5 +1,4 @@
 import { error as LogError, info as LogInfo } from 'electron-log';
-
 /**
  * Write logs to file using electron-log
  */

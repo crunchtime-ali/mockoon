@@ -4,22 +4,12 @@ import { OpenAPIV2, OpenAPIV3 } from 'openapi-types';
 import { Logger } from 'src/app/classes/logger';
 import { INDENT_SIZE } from 'src/app/constants/common.constants';
 import { Errors } from 'src/app/enums/errors.enum';
-import {
-  GetRouteResponseContentType,
-  RemoveLeadingSlash
-} from 'src/app/libs/utils.lib';
+import { RemoveLeadingSlash } from 'src/app/libs/utils.lib';
 import { SchemasBuilderService } from 'src/app/services/schemas-builder.service';
 import { ToastsService } from 'src/app/services/toasts.service';
-import { Environment } from 'src/app/types/environment.type';
-import {
-  Header,
-  Method,
-  methods,
-  Route,
-  RouteResponse,
-  statusCodes
-} from 'src/app/types/route.type';
 import { parse as urlParse } from 'url';
+import { Environment, GetRouteResponseContentType, Route, RouteResponse, Method, Header } from '@mockoon/commons';
+import { methods, statusCodes } from 'src/app/constants/routes.constants';
 
 type ParametersTypes = 'PATH_PARAMETERS' | 'SERVER_VARIABLES';
 type SpecificationVersions = 'SWAGGER' | 'OPENAPI_V3';

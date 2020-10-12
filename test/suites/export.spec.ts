@@ -1,5 +1,5 @@
 import { Config } from 'src/app/config';
-import { Export } from 'src/app/types/data.type';
+import { Export } from 'src/app/models/data.model';
 import { Tests } from 'test/lib/tests';
 import { v1 as uuid } from 'uuid';
 

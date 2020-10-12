@@ -5,7 +5,7 @@ import { Logger } from 'src/app/classes/logger';
 import { HighestMigrationId, Migrations } from 'src/app/libs/migrations.lib';
 import { SettingsService } from 'src/app/services/settings.service';
 import { Store } from 'src/app/stores/store';
-import { Environment, Environments } from 'src/app/types/environment.type';
+import { Environments, Environment } from '@mockoon/commons';
 
 @Injectable({ providedIn: 'root' })
 export class MigrationService {
