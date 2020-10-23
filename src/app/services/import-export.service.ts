@@ -3,7 +3,7 @@ import { Environment, Environments, Route } from '@mockoon/commons';
 import { clipboard, remote } from 'electron';
 import { readFile, writeFile } from 'fs';
 import { cloneDeep } from 'lodash';
-import { Logger } from 'src/app/classes/logger.js';
+import { Logger } from 'src/app/classes/logger';
 import { Config } from 'src/app/config';
 import { AnalyticsEvents } from 'src/app/enums/analytics-events.enum';
 import { Errors } from 'src/app/enums/errors.enum';
@@ -73,9 +73,7 @@ export class ImportExportService {
         } else {
           this.toastService.addToast('success', Messages.EXPORT_SUCCESS);
 
-          this.eventsService.analyticsEvents.next(
-            AnalyticsEvents.EXPORT_FILE
-          );
+          this.eventsService.analyticsEvents.next(AnalyticsEvents.EXPORT_FILE);
         }
       });
     }
@@ -104,7 +102,10 @@ export class ImportExportService {
         if (error) {
           this.toastService.addToast('error', Errors.EXPORT_ERROR);
         } else {
-          this.toastService.addToast('success', Messages.EXPORT_SELECTED_SUCCESS);
+          this.toastService.addToast(
+            'success',
+            Messages.EXPORT_SELECTED_SUCCESS
+          );
 
           this.eventsService.analyticsEvents.next(
             AnalyticsEvents.EXPORT_FILE_SELECTED
@@ -129,9 +130,7 @@ export class ImportExportService {
         callback
       );
     } catch (error) {
-      this.logger.error(
-        `Error while exporting environments: ${error.message}`
-      );
+      this.logger.error(`Error while exporting environments: ${error.message}`);
 
       this.toastService.addToast('error', Errors.EXPORT_ERROR);
     }

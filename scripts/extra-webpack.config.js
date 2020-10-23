@@ -9,7 +9,7 @@ module.exports = {
     express: "require('express')",
     fs: "require('fs')",
     'write-file-atomic': "require('write-file-atomic')",
-    handlebars: "require('handlebars')",
+    //handlebars: "require('handlebars')",
     http: "require('http')",
     https: "require('https')",
     lockfile: "require('lockfile')",

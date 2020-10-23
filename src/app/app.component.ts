@@ -19,7 +19,6 @@ import {
   map,
   tap
 } from 'rxjs/operators';
-import { Logger } from 'src/app/classes/logger';
 import { TimedBoolean } from 'src/app/classes/timed-boolean';
 import { ChangelogModalComponent } from 'src/app/components/changelog-modal.component';
 import { SettingsModalComponent } from 'src/app/components/settings-modal.component';
@@ -59,6 +58,7 @@ import {
   ViewsNameType
 } from 'src/app/stores/store';
 import { Environment, Header, Route, RouteResponse, Environments, IsValidURL, GetRouteResponseContentType } from '@mockoon/commons';
+import { Logger } from 'src/app/classes/logger';
 
 @Component({
   selector: 'app-root',

@@ -10,7 +10,6 @@ import {
 import { cloneDeep } from 'lodash';
 import { of } from 'rxjs';
 import { concatMap, mergeMap, tap } from 'rxjs/operators';
-import { Logger } from 'src/app/classes/logger';
 import { AnalyticsEvents } from 'src/app/enums/analytics-events.enum';
 import { FocusableInputs } from 'src/app/enums/ui.enum';
 import { EnvironmentProperties } from 'src/app/models/environment.model';
@@ -60,6 +59,7 @@ import {
   TabsNameType,
   ViewsNameType
 } from 'src/app/stores/store';
+import { Logger } from 'src/app/classes/logger';
 
 @Injectable({
   providedIn: 'root'

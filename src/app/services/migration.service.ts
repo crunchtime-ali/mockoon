@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
+import { Environment, Environments } from '@mockoon/commons';
 import { Observable } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 import { Logger } from 'src/app/classes/logger';
 import { HighestMigrationId, Migrations } from 'src/app/libs/migrations.lib';
 import { SettingsService } from 'src/app/services/settings.service';
 import { Store } from 'src/app/stores/store';
-import { Environments, Environment } from '@mockoon/commons';
 
 @Injectable({ providedIn: 'root' })
 export class MigrationService {
