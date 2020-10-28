@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Environment, MockoonServer } from '@mockoon/commons';
+import { Environment, MockoonResponse, MockoonServer } from '@mockoon/commons';
 import { Logger } from 'src/app/classes/logger';
 import { AnalyticsEvents } from 'src/app/enums/analytics-events.enum';
 import { MessageParams } from 'src/app/models/messages.model';
@@ -34,8 +34,7 @@ export class ServerService extends Logger {
     const server = new MockoonServer(environment, {
       refreshEnvironmentFunction: (environmentUUID) =>
         this.store.getEnvironmentByUUID(environmentUUID),
-      refreshDuplicatedRoutesFunction: (environmentUUID) =>
-        this.store.get('duplicatedRoutes')[environmentUUID]
+      duplicatedRouteUUIDs: this.store.get('duplicatedRoutes')[environment.uuid]
     });
 
     this.addListeners(server, environment);
@@ -113,7 +112,7 @@ export class ServerService extends Logger {
       );
     });
 
-    server.on('response-close', (response) => {
+    server.on('response-close', (response: MockoonResponse) => {
       this.store.update(
         logRequestAction(environment.uuid, this.dataService.formatLog(response))
       );

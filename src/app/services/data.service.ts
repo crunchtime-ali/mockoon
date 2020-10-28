@@ -3,9 +3,9 @@ import {
   BINARY_BODY,
   Environment,
   Environments,
+  MockoonResponse,
   Route
 } from '@mockoon/commons';
-import { Response } from 'express';
 import { AscSort, ObjectValuesFlatten } from 'src/app/libs/utils.lib';
 import { EnvironmentLog } from 'src/app/models/environment-logs.model';
 import { Store } from 'src/app/stores/store';
@@ -21,7 +21,7 @@ export class DataService {
    *
    * @param response
    */
-  public formatLog(response: Response): EnvironmentLog {
+  public formatLog(response: MockoonResponse): EnvironmentLog {
     const request = response.req;
     const flattenedRequestHeaders = ObjectValuesFlatten(request.headers);
     const flattenedResponseHeaders = ObjectValuesFlatten(response.getHeaders());
@@ -44,7 +44,7 @@ export class DataService {
         queryParams: request.query
           ? Object.keys(request.query).map((queryParamName) => ({
               name: queryParamName,
-              value: request.query[queryParamName]
+              value: request.query[queryParamName] as string
             }))
           : [],
         body: request.body,
